@@ -1,0 +1,88 @@
+{
+  "creditCard": {
+    "id": "",
+    "issuer": "",
+    "number": "",
+    "name": "",
+    "adress": "",
+    "country": "",
+    "exp": ""
+  },
+  "cart": {
+    "id": "",
+    "user": {
+      "id": "",
+      "email": ""
+    },
+    "shippingAddress": {
+      "title": "",
+      "street": "",
+      "city": "",
+      "zipCode": "",
+      "country": ""
+    },
+    "billingAddress": {
+      "title": "",
+      "street": "",
+      "city": "",
+      "zipCode": "",
+      "country": ""
+    },
+    "items": [
+      {
+        "number": "",
+        "product": {
+          "id": "",
+          "name": "",
+          "description": ""
+        },
+        "price": ""
+      }
+    ]
+  }
+}
+
+
+{
+  "creditCard": {
+    "id": "",
+    "issuer": "",
+    "number": "",
+    "name": "",
+    "adress": "",
+    "country": "",
+    "exp": ""
+  },
+  "order": {
+    "id": "",
+    "value": "",
+    "store": "",
+    "date": ""
+  }
+}
+
+{
+  "transaction": {
+    "id": "",
+    "status": "",
+    "orderId": ""
+  }
+}
+
+{
+  "request": {
+    "type": ""
+    "user": {
+      "id": "",
+      "email": ""
+    },
+    "order": {
+      "id": "",
+      "total": ""
+    },
+    "store": {
+      "name": ""
+    },
+    "pointsEarned": ""
+  }
+}
