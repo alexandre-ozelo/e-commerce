@@ -3,6 +3,7 @@ package com.sensedia.ecommerce;
 import com.sensedia.ecommerce.domain.resource.Ecommerce;
 import com.sensedia.ecommerce.infra.verticles.CashbackWorker;
 import com.sensedia.ecommerce.infra.verticles.PaymentWorker;
+import com.sensedia.ecommerce.infra.verticles.PurchaseWorker;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import lombok.extern.slf4j.Slf4j;
@@ -16,5 +17,6 @@ public class EcommerceApplication {
     vertx.deployVerticle(new Ecommerce(), new DeploymentOptions().setWorker(false));
     vertx.deployVerticle(new PaymentWorker(), new DeploymentOptions().setWorker(true));
     vertx.deployVerticle(new CashbackWorker(), new DeploymentOptions().setWorker(true));
+    vertx.deployVerticle(new PurchaseWorker(), new DeploymentOptions().setWorker(true));
   }
 }

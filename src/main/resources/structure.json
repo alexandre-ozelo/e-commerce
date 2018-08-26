@@ -15,18 +15,22 @@
       "email": ""
     },
     "shippingAddress": {
-      "title": "",
-      "street": "",
-      "city": "",
-      "zipCode": "",
-      "country": ""
+      "address": {
+        "title": "",
+        "street": "",
+        "city": "",
+        "zipCode": "",
+        "country": ""
+      }
     },
     "billingAddress": {
-      "title": "",
-      "street": "",
-      "city": "",
-      "zipCode": "",
-      "country": ""
+      "address": {
+        "title": "",
+        "street": "",
+        "city": "",
+        "zipCode": "",
+        "country": ""
+      }
     },
     "items": [
       {

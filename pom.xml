@@ -14,7 +14,7 @@
     <lombok.version>1.16.20</lombok.version>
     <logback.version>1.2.3</logback.version>
     <docker-plugin.version>3.5.40</docker-plugin.version>
-    <cassandre.version>3.6.1</cassandre.version>
+    <jackson.datatype.version>2.9.6</jackson.datatype.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
@@ -177,13 +177,18 @@
       <groupId>io.vertx</groupId>
       <artifactId>vertx-kafka-client</artifactId>
       <version>${vertx.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-log4j12</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
-    <!-- https://mvnrepository.com/artifact/com.englishtown.vertx/vertx-cassandra -->
     <dependency>
-      <groupId>com.englishtown.vertx</groupId>
-      <artifactId>vertx-cassandra</artifactId>
-      <version>${cassandre.version}</version>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-mongo-client</artifactId>
+      <version>${vertx.version}</version>
     </dependency>
 
     <dependency>
@@ -197,6 +202,12 @@
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
       <version>${logback.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.fasterxml.jackson.datatype</groupId>
+      <artifactId>jackson-datatype-jsr310</artifactId>
+      <version>${jackson.datatype.version}</version>
     </dependency>
 
   </dependencies>
