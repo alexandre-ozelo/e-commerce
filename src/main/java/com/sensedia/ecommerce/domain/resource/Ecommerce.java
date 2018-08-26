@@ -24,34 +24,12 @@ public class Ecommerce extends AbstractVerticle {
     val httpServer = this.vertx.createHttpServer();
 
     router.get("/api/healthcheck").handler(healthCheck);
-
     router.route().handler(BodyHandler.create());
-
-    router.post("/api/payment").handler(res -> {
-      val body = res.getBodyAsJson();
-      this.vertx.eventBus().send("ecommerce.payment", body, callback -> {
-        if (callback.succeeded()) {
-          log.info("Success call for e-commerce payment: {}", callback.result().body().toString());
-        } else {
-          log.error("Problem with e-commerce payment");
-        }
-      });
-
-      this.vertx.eventBus().send("ecommerce.cashback", body, callback -> {
-        if (callback.succeeded()) {
-          log.info("Success call for e-commerce cashback: {}", callback.result().body().toString());
-        } else {
-          log.error("Problem with e-commerce casback");
-        }
-      });
-
-      res.response().setStatusCode(HttpResponseStatus.ACCEPTED.code()).end();
-    });
 
     router.post("/api/purchase").handler(res -> {
       this.vertx.eventBus().send("ecommerce.purchase", res.getBodyAsJson(), callback -> {
         if (callback.succeeded()) {
-          log.info("Success call for e-commerce purchase: {}", callback.result().body().toString());
+          log.info("Success call for e-commerce purchase");
         } else {
           log.error("Problem with e-commerce purchase");
         }
@@ -66,7 +44,7 @@ public class Ecommerce extends AbstractVerticle {
           log.info("Success call for e-commerce get purchase list");
           if (Objects.isNull(callback.result().body())) {
             res.response().setStatusCode(HttpResponseStatus.NO_CONTENT.code()).end();
-          }else{
+          } else {
             res.response().setStatusCode(HttpResponseStatus.OK.code())
               .putHeader(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON)
               .end(callback.result().body().toString());

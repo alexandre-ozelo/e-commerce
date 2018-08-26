@@ -22,17 +22,36 @@ public class PurchaseWorker extends AbstractVerticle {
   public void start() {
     this.vertx.eventBus().consumer("ecommerce.purchase", handler -> {
       val client = MongoClient.createShared(vertx, config);
-      client.save("purchases", new JsonObject(handler.body().toString()), res -> {
+      val purchaseObj = new JsonObject(handler.body().toString());
+
+      client.save("purchases", purchaseObj, res -> {
         if (res.succeeded()) {
           val id = res.result();
           log.info("Saved purchase with id " + id);
-          handler.reply("id: " + id);
         } else {
           log.error("Error saving purchase: {}", handler.body().toString());
           res.cause().printStackTrace();
           handler.fail(1, "Call fail");
         }
       });
+
+      this.vertx.eventBus().send("ecommerce.payment", purchaseObj, callback -> {
+        if (callback.succeeded()) {
+          log.info("Success call for e-commerce payment");
+        } else {
+          log.error("Problem with e-commerce payment");
+        }
+      });
+
+      this.vertx.eventBus().send("ecommerce.cashback", purchaseObj, callback -> {
+        if (callback.succeeded()) {
+          log.info("Success call for e-commerce cashback");
+        } else {
+          log.error("Problem with e-commerce cashback");
+        }
+      });
+
+      handler.reply("Ok");
     });
 
     this.vertx.eventBus().consumer("ecommerce.purchase.get", handler -> {

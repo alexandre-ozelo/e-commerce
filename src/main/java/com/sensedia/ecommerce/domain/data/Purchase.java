@@ -18,6 +18,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class Purchase {
 
+  private String _id;
   private CreditCard creditCard;
   private Cart cart;
 
