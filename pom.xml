@@ -19,7 +19,7 @@
   </properties>
 
   <build>
-    <finalName>e_commerce</finalName>
+    <finalName>e-commerce</finalName>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -46,41 +46,16 @@
                 <transformer
                   implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                   <manifestEntries>
-                    <Main-Class>io.vertx.core.Launcher</Main-Class>
-                    <Main-Verticle>com.sensedia.ecommerce.EcommerceApplication
-                    </Main-Verticle>
+                    <Main-Class>com.sensedia.ecommerce.EcommerceApplication</Main-Class>
                   </manifestEntries>
                 </transformer>
                 <transformer
                   implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
-                  <resource>META-INF/services/io.vertx.core.spi.VerticleFactory
-                  </resource>
-                  <resource>
-                    META-INF/services/io.vertx.core.spi.launcher.CommandFactory
-                  </resource>
                 </transformer>
               </transformers>
-              <artifactSet>
-              </artifactSet>
-              <outputFile>
-                ${project.build.directory}/${project.artifactId}-${project.version}-fat.jar
-              </outputFile>
             </configuration>
           </execution>
         </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>exec-maven-plugin</artifactId>
-        <version>1.5.0</version>
-        <configuration>
-          <mainClass>io.vertx.core.Launcher</mainClass>
-          <arguments>
-            <argument>run</argument>
-            <argument>com.sensedia.ecommerce.EcommerceApplication</argument>
-          </arguments>
-        </configuration>
       </plugin>
 
       <plugin>
@@ -91,16 +66,28 @@
           <resources>
             <labels>
               <deployment>
-                <propenverty>
+                <property>
                   <name>version</name>
                   <value>v1</value>
-                </propenverty>
+                </property>
+                <property>
+                  <name>expose</name>
+                  <value>false</value>
+                </property>
               </deployment>
             </labels>
+            <annotations>
+              <deployment>
+                <property>
+                  <name>sidecar.istio.io/inject</name>
+                  <value>true</value>
+                </property>
+              </deployment>
+            </annotations>
           </resources>
           <images>
             <image>
-              <name>ozello/${project.artifactId}</name>
+              <name>ozello/${project.build.finalName}</name>
               <build>
                 <from>openjdk:8-jre-alpine3.7</from>
                 <entryPoint>java -jar /app/${project.build.finalName}.jar</entryPoint>
@@ -131,7 +118,6 @@
           </images>
         </configuration>
       </plugin>
-
     </plugins>
   </build>
 

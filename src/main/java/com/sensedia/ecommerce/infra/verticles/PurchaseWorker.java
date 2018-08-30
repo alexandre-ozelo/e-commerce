@@ -13,13 +13,13 @@ public class PurchaseWorker extends AbstractVerticle {
 
   private JsonObject config;
 
-  public PurchaseWorker() {
-    this.config = new JsonObject()
-      .put("connection_string", "mongodb://localhost:27017")
-      .put("db_name", "ecommerce");
-  }
-
   public void start() {
+
+    this.config = new JsonObject()
+      .put("host", config().getString("host"))
+      .put("port", config().getInteger("port"))
+      .put("db_name", "ecommerce");
+
     this.vertx.eventBus().consumer("ecommerce.purchase", handler -> {
       val client = MongoClient.createShared(vertx, config);
       val purchaseObj = new JsonObject(handler.body().toString());

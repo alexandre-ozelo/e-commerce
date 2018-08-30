@@ -1,0 +1,94 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "ecommerce"
+  labels:
+    app: "ecommerce"
+data:
+  MONGO_HOST: "mongodb"
+  MONGO_PORT: "27017"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    fabric8.io/git-commit: 564882cd43373fc632522e044f557edc61de79a8
+    fabric8.io/iconUrl: img/icons/vertx.svg
+    fabric8.io/git-branch: dev
+  labels:
+    expose: "true"
+    app: ecommerce
+    provider: fabric8
+    version: 1.0.0-SNAPSHOT
+    group: com.sensedia
+  name: ecommerce
+spec:
+  ports:
+  - name: http
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: ecommerce
+    provider: fabric8
+    group: com.sensedia
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    sidecar.istio.io/inject: "true"
+    fabric8.io/git-commit: 564882cd43373fc632522e044f557edc61de79a8
+    fabric8.io/iconUrl: img/icons/vertx.svg
+    fabric8.io/git-branch: dev
+    fabric8.io/metrics-path: dashboard/file/kubernetes-pods.json/?var-project=ecommerce&var-version=1.0.0-SNAPSHOT
+  labels:
+    version: v1
+    expose: "false"
+    app: ecommerce
+    provider: fabric8
+    group: com.sensedia
+  name: ecommerce
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: ecommerce
+      provider: fabric8
+      group: com.sensedia
+  template:
+    metadata:
+      annotations:
+        fabric8.io/git-commit: 564882cd43373fc632522e044f557edc61de79a8
+        fabric8.io/iconUrl: img/icons/vertx.svg
+        fabric8.io/git-branch: dev
+        fabric8.io/metrics-path: dashboard/file/kubernetes-pods.json/?var-project=ecommerce&var-version=1.0.0-SNAPSHOT
+        sidecar.istio.io/inject: "true"
+      labels:
+        app: ecommerce
+        provider: fabric8
+        version: 1.0.0-SNAPSHOT
+        group: com.sensedia
+    spec:
+      containers:
+      - env:
+        - name: MONGO_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: MONGO_HOST
+              name: ecommerce
+        - name: MONGO_PORT
+          valueFrom:
+            configMapKeyRef:
+              key: MONGO_PORT
+              name: ecommerce
+        image: ozello/e-commerce
+        imagePullPolicy: IfNotPresent
+        name: e-commerce
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        securityContext:
+          privileged: false
