@@ -16,8 +16,8 @@ public class PurchaseWorker extends AbstractVerticle {
   public void start() {
 
     this.config = new JsonObject()
-      .put("host", config().getString("host"))
-      .put("port", config().getInteger("port"))
+      .put("host", config().getString("mongoHost"))
+      .put("port", config().getInteger("mongoPort"))
       .put("db_name", "ecommerce");
 
     this.vertx.eventBus().consumer("ecommerce.purchase", handler -> {
