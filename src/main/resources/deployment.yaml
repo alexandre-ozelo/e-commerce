@@ -85,8 +85,18 @@ spec:
             configMapKeyRef:
               key: MONGO_PORT
               name: ecommerce
+        - name: KAFKA_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: KAFKA_HOST
+              name: payment
+        - name: KAFKA_PORT
+          valueFrom:
+            configMapKeyRef:
+              key: KAFKA_PORT
+              name: payment
         image: ozello/e-commerce
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         name: e-commerce
         ports:
         - containerPort: 8080
