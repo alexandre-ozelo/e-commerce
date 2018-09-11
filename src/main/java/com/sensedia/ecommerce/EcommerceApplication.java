@@ -40,7 +40,11 @@ public class EcommerceApplication {
           .put("kafkaHost", StringUtil.isNullOrEmpty(config.getString("KAFKA_HOST")) ? "localhost"
             : config.getString("KAFKA_HOST"))
           .put("kafkaPort", Objects.isNull(config.getInteger("KAFKA_PORT")) ? 9092
-            : config.getInteger("KAFKA_PORT"));
+            : config.getInteger("KAFKA_PORT"))
+          .put("cashBackHost", StringUtil.isNullOrEmpty(config.getString("CASH_BACK_HOST")) ? "localhost"
+          : config.getString("CASH_BACK_HOST"))
+          .put("cashBackPort", Objects.isNull(config.getInteger("CASH_BACK_PORT")) ? 8082
+            : config.getInteger("CASH_BACK_PORT"));
 
         log.info("Enviroment data: {}", metadata.toString());
 

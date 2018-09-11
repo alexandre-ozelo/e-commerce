@@ -26,7 +26,7 @@ public class Purchase {
   @NoArgsConstructor
   @Data
   @Builder
-  private static class CreditCard {
+  public static class CreditCard {
 
     private String id;
     private String issuer;
@@ -43,7 +43,7 @@ public class Purchase {
   @NoArgsConstructor
   @Data
   @Builder
-  private static class Cart {
+  public static class Cart {
 
     private String id;
     private User user;
@@ -55,7 +55,7 @@ public class Purchase {
     @NoArgsConstructor
     @Data
     @Builder
-    private static class User {
+    public static class User {
 
       private String id;
       private String email;
@@ -65,7 +65,7 @@ public class Purchase {
     @NoArgsConstructor
     @Data
     @Builder
-    private static class ShippingAddress {
+    public static class ShippingAddress {
 
       private Address address;
     }
@@ -74,7 +74,7 @@ public class Purchase {
     @NoArgsConstructor
     @Data
     @Builder
-    private static class BillingAddress {
+    public static class BillingAddress {
 
       private Address address;
     }
@@ -83,7 +83,7 @@ public class Purchase {
     @NoArgsConstructor
     @Data
     @Builder
-    private static class Address {
+    public static class Address {
 
       private String title;
       private String street;
@@ -96,7 +96,7 @@ public class Purchase {
     @NoArgsConstructor
     @Data
     @Builder
-    private static class Items {
+    public static class Items {
 
       private String number;
       private Product product;
@@ -106,7 +106,7 @@ public class Purchase {
       @NoArgsConstructor
       @Data
       @Builder
-      private static class Product {
+      public static class Product {
 
         private String id;
         private String name;

@@ -1,6 +1,6 @@
 package com.sensedia.ecommerce.infra.verticles;
 
-import com.sensedia.ecommerce.domain.data.Purchase;
+import com.sensedia.ecommerce.domain.data.Payment;
 import com.sensedia.ecommerce.infra.kafka.Producer;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.json.Json;
@@ -19,13 +19,13 @@ public class PaymentWorker extends AbstractVerticle {
 
     this.vertx.eventBus().consumer("ecommerce.payment", handler -> {
 
-      val purchase = Json.decodeValue(handler.body().toString(), Purchase.class);
+      val payment = Json.decodeValue(handler.body().toString(), Payment.class);
 
-      log.info("Received message message: {}", purchase);
+      log.info("Received message message: {}", payment);
 
       val record =
         KafkaProducerRecord
-          .create("payment-topic", purchase.get_id(), new JsonObject(handler.body().toString()));
+          .create("payment-topic", payment.get_id(), new JsonObject(handler.body().toString()));
 
       producer.write(record, done -> {
         if (done.succeeded()) {
