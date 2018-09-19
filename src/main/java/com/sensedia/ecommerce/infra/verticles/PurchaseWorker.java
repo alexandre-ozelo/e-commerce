@@ -1,6 +1,6 @@
 package com.sensedia.ecommerce.infra.verticles;
 
-import com.sensedia.ecommerce.domain.data.Cashback;
+import com.sensedia.ecommerce.domain.data.Order;
 import com.sensedia.ecommerce.domain.data.Payment;
 import com.sensedia.ecommerce.domain.data.Purchase;
 import com.sensedia.ecommerce.domain.data.Purchase.Cart.Items;
@@ -9,7 +9,7 @@ import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.mongo.MongoClient;
 import java.math.BigDecimal;
-import java.security.SecureRandom;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
@@ -17,6 +17,7 @@ import lombok.val;
 public class PurchaseWorker extends AbstractVerticle {
 
   private JsonObject config;
+  private Double cashBackPerc;
 
   public void start() {
 
@@ -25,40 +26,49 @@ public class PurchaseWorker extends AbstractVerticle {
       .put("port", config().getInteger("mongoPort"))
       .put("db_name", "ecommerce");
 
+    this.cashBackPerc = config().getDouble("cashBackPerc");
+
     this.vertx.eventBus().consumer("ecommerce.purchase", handler -> {
       val client = MongoClient.createShared(vertx, config);
       val purchaseObj = new JsonObject(handler.body().toString());
       val purchase = Json.decodeValue(handler.body().toString(), Purchase.class);
+      val payment = Payment.builder().id(UUID.randomUUID().toString())
+        .user(purchase.getCart().getUser())
+        .creditCard(purchase.getCreditCard()).ammount(this.processPayment(purchase)).build();
+      val order = Order.builder().user(purchase.getCart().getUser())
+        .id(UUID.randomUUID().toString()).paymentId(payment.getId())
+        .points(this.processCashback(payment)).store("Beer house").build();
 
       client.save("purchases", purchaseObj, res -> {
         if (res.succeeded()) {
           val id = res.result();
           log.info("Saved purchase with id " + id);
+
+          this.vertx.eventBus()
+            .send("ecommerce.payment", Json.encode(payment), callback -> {
+              if (callback.succeeded()) {
+                log.info("Success call for e-commerce payment");
+              } else {
+                log.error("Problem with e-commerce payment");
+              }
+            });
+
+          this.vertx.eventBus()
+            .send("ecommerce.cashback.register", Json.encode(order), callback -> {
+              if (callback.succeeded()) {
+                log.info("Success call for e-commerce cashback");
+              } else {
+                log.error("Problem with e-commerce cashback");
+              }
+
+            });
+          handler.reply("Ok");
         } else {
-          log.error("Error saving purchase: {}", handler.body().toString());
-          res.cause().printStackTrace();
+          log.error("Error saving purchase: {}, with cause: {}", handler.body().toString(),
+            res.cause().getMessage());
           handler.fail(1, "Call fail");
         }
       });
-
-      this.vertx.eventBus()
-        .send("ecommerce.payment", Json.encode(this.processPayment(purchase)), callback -> {
-          if (callback.succeeded()) {
-            log.info("Success call for e-commerce payment");
-          } else {
-            log.error("Problem with e-commerce payment");
-          }
-        });
-
-      this.vertx.eventBus().send("ecommerce.cashback", purchaseObj, callback -> {
-        if (callback.succeeded()) {
-          log.info("Success call for e-commerce cashback");
-        } else {
-          log.error("Problem with e-commerce cashback");
-        }
-      });
-
-      handler.reply("Ok");
     });
 
     this.vertx.eventBus().consumer("ecommerce.purchase.get", handler -> {
@@ -94,17 +104,13 @@ public class PurchaseWorker extends AbstractVerticle {
     });
   }
 
-  private Payment processPayment(Purchase purchase) {
-    BigDecimal amount = purchase.getCart().getItems().stream().map(Items::getPrice)
+  private BigDecimal processPayment(Purchase purchase) {
+    return purchase.getCart().getItems().stream().map(Items::getPrice)
       .reduce(BigDecimal.ZERO, BigDecimal::add);
-    return Payment.builder().creditCard(purchase.getCreditCard()).user(purchase.getCart().getUser())
-      .ammount(amount).build();
   }
 
-  private Cashback processCashback(Purchase purchase) {
-    BigDecimal amount = purchase.getCart().getItems().stream().map(Items::getPrice)
-      .reduce(BigDecimal.ZERO, BigDecimal::add);
-    return Cashback.builder().user(purchase.getCart().getUser()).points(amount).build();
+  private Double processCashback(Payment payment) {
+    return payment.getAmmount().multiply(BigDecimal.valueOf(this.cashBackPerc / 100)).doubleValue();
   }
 
 }

@@ -1,7 +1,8 @@
 package com.sensedia.ecommerce;
 
 import com.sensedia.ecommerce.domain.resource.Ecommerce;
-import com.sensedia.ecommerce.infra.verticles.CashbackWorker;
+import com.sensedia.ecommerce.infra.verticles.CashbackRegisterWorker;
+import com.sensedia.ecommerce.infra.verticles.CashbackUndoWorker;
 import com.sensedia.ecommerce.infra.verticles.PaymentResponseWorker;
 import com.sensedia.ecommerce.infra.verticles.PaymentWorker;
 import com.sensedia.ecommerce.infra.verticles.PurchaseWorker;
@@ -44,7 +45,9 @@ public class EcommerceApplication {
           .put("cashBackHost", StringUtil.isNullOrEmpty(config.getString("CASH_BACK_HOST")) ? "localhost"
           : config.getString("CASH_BACK_HOST"))
           .put("cashBackPort", Objects.isNull(config.getInteger("CASH_BACK_PORT")) ? 8082
-            : config.getInteger("CASH_BACK_PORT"));
+            : config.getInteger("CASH_BACK_PORT"))
+          .put("cashBackPerc", Objects.isNull(config.getDouble("CASH_BACK_PERC")) ? 10.0
+          : config.getDouble("CASH_BACK_PERC"));
 
         log.info("Enviroment data: {}", metadata.toString());
 
@@ -54,7 +57,8 @@ public class EcommerceApplication {
         vertx.deployVerticle(new Ecommerce(), deploymentOptions.setWorker(false));
         vertx.deployVerticle(new PaymentWorker(), deploymentOptions.setWorker(true));
         vertx.deployVerticle(new PaymentResponseWorker(), deploymentOptions.setWorker(true));
-        vertx.deployVerticle(new CashbackWorker(), deploymentOptions.setWorker(true));
+        vertx.deployVerticle(new CashbackRegisterWorker(), deploymentOptions.setWorker(true));
+        vertx.deployVerticle(new CashbackUndoWorker(), deploymentOptions.setWorker(true));
         vertx.deployVerticle(new PurchaseWorker(), deploymentOptions.setWorker(true));
       }
     });

@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class Payment {
 
-  private String _id;
+  private String id;
   private CreditCard creditCard;
   private User user;
   private BigDecimal ammount;

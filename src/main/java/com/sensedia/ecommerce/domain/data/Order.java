@@ -1,7 +1,6 @@
 package com.sensedia.ecommerce.domain.data;
 
 import com.sensedia.ecommerce.domain.data.Purchase.Cart.User;
-import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,10 +10,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @Builder
-public class Cashback {
+public class Order {
 
-  private String transactionId;
+  private String id;
+  private String paymentId;
   private User user;
-  private BigDecimal points;
+  private String store;
+  private Double points;
 
 }

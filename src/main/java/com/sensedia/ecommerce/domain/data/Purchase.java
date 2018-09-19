@@ -1,5 +1,6 @@
 package com.sensedia.ecommerce.domain.data;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
@@ -18,7 +19,8 @@ import lombok.NoArgsConstructor;
 @Builder
 public class Purchase {
 
-  private String _id;
+  @JsonProperty("_id")
+  private String id;
   private CreditCard creditCard;
   private Cart cart;
 

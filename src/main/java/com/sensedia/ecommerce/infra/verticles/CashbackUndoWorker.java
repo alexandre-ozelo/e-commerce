@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
 @Slf4j
-public class CashbackWorker extends AbstractVerticle {
+public class CashbackUndoWorker extends AbstractVerticle {
 
   public void start() {
     this.vertx.eventBus().consumer("ecommerce.cashback", handler -> {
@@ -36,9 +36,10 @@ public class CashbackWorker extends AbstractVerticle {
           User.newBuilder().setEmail("joe@joe.com").setId("joe").build())
         .setStore(Store.newBuilder().setName("ABC").build()).setType("register").build();
 
-      stub.register(cashbackRequest,ar ->{
-        if (ar.succeeded()){
-          log.info("Got the server response: {}",  ar.result().getId());
+
+      stub.register(cashbackRequest, ar -> {
+        if (ar.succeeded()) {
+          log.info("Got the server response: {}", ar.result().getId());
         } else {
           log.error("Coult not reach server: {}", ar.cause().getMessage());
         }

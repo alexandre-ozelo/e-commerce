@@ -1,12 +1,7 @@
 package com.sensedia.ecommerce.infra.verticles;
 
-import com.sensedia.ecommerce.domain.data.Purchase;
 import com.sensedia.ecommerce.infra.kafka.Consumer;
-import com.sensedia.ecommerce.infra.kafka.Producer;
 import io.vertx.core.AbstractVerticle;
-import io.vertx.core.json.Json;
-import io.vertx.core.json.JsonObject;
-import io.vertx.kafka.client.producer.KafkaProducerRecord;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 

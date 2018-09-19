@@ -25,7 +25,7 @@ public class PaymentWorker extends AbstractVerticle {
 
       val record =
         KafkaProducerRecord
-          .create("payment-topic", payment.get_id(), new JsonObject(handler.body().toString()));
+          .create("payment-topic", payment.getId(), new JsonObject(handler.body().toString()));
 
       producer.write(record, done -> {
         if (done.succeeded()) {
