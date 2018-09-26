@@ -41,8 +41,7 @@ public class PurchaseWorker extends AbstractVerticle {
 
       client.save("purchases", purchaseObj, res -> {
         if (res.succeeded()) {
-          val id = res.result();
-          log.info("Saved purchase with id " + id);
+          log.info("Saved purchase with id " + payment.getId());
 
           this.vertx.eventBus()
             .send("ecommerce.payment", Json.encode(payment), callback -> {

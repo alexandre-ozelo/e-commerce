@@ -5,6 +5,7 @@ import com.sensedia.ecommerce.infra.verticles.CashbackRegisterWorker;
 import com.sensedia.ecommerce.infra.verticles.CashbackUndoWorker;
 import com.sensedia.ecommerce.infra.verticles.PaymentResponseWorker;
 import com.sensedia.ecommerce.infra.verticles.PaymentWorker;
+import com.sensedia.ecommerce.infra.verticles.PurchaseResponseWorker;
 import com.sensedia.ecommerce.infra.verticles.PurchaseWorker;
 import io.netty.util.internal.StringUtil;
 import io.vertx.config.ConfigRetriever;
@@ -42,12 +43,13 @@ public class EcommerceApplication {
             : config.getString("KAFKA_HOST"))
           .put("kafkaPort", Objects.isNull(config.getInteger("KAFKA_PORT")) ? 9092
             : config.getInteger("KAFKA_PORT"))
-          .put("cashBackHost", StringUtil.isNullOrEmpty(config.getString("CASH_BACK_HOST")) ? "localhost"
-          : config.getString("CASH_BACK_HOST"))
+          .put("cashBackHost",
+            StringUtil.isNullOrEmpty(config.getString("CASH_BACK_HOST")) ? "localhost"
+              : config.getString("CASH_BACK_HOST"))
           .put("cashBackPort", Objects.isNull(config.getInteger("CASH_BACK_PORT")) ? 8082
             : config.getInteger("CASH_BACK_PORT"))
           .put("cashBackPerc", Objects.isNull(config.getDouble("CASH_BACK_PERC")) ? 10.0
-          : config.getDouble("CASH_BACK_PERC"));
+            : config.getDouble("CASH_BACK_PERC"));
 
         log.info("Enviroment data: {}", metadata.toString());
 
@@ -60,6 +62,7 @@ public class EcommerceApplication {
         vertx.deployVerticle(new CashbackRegisterWorker(), deploymentOptions.setWorker(true));
         vertx.deployVerticle(new CashbackUndoWorker(), deploymentOptions.setWorker(true));
         vertx.deployVerticle(new PurchaseWorker(), deploymentOptions.setWorker(true));
+        vertx.deployVerticle(new PurchaseResponseWorker(), deploymentOptions.setWorker(true));
       }
     });
   }

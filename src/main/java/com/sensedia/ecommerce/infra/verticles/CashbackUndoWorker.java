@@ -1,16 +1,10 @@
 package com.sensedia.ecommerce.infra.verticles;
 
-import com.sensedia.cashback.infra.proto.Order;
-import com.sensedia.cashback.infra.proto.RegisterCashbackRequest;
-import com.sensedia.cashback.infra.proto.RegisterCashbackTransactionGrpc;
-import com.sensedia.cashback.infra.proto.RegisterCashbackTransactionGrpc.RegisterCashbackTransactionVertxStub;
-import com.sensedia.cashback.infra.proto.Store;
-import com.sensedia.cashback.infra.proto.User;
-import com.sensedia.ecommerce.domain.data.Purchase;
-import io.grpc.ManagedChannel;
+import com.sensedia.ecommerce.infra.grpc.CashBackRequest;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.json.Json;
-import io.vertx.grpc.VertxChannelBuilder;
+import io.vertx.core.json.JsonObject;
+import io.vertx.ext.mongo.MongoClient;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
@@ -18,35 +12,35 @@ import lombok.val;
 public class CashbackUndoWorker extends AbstractVerticle {
 
   public void start() {
-    this.vertx.eventBus().consumer("ecommerce.cashback", handler -> {
-      val purchase = Json.decodeValue(handler.body().toString(), Purchase.class);
+    this.vertx.eventBus().consumer("ecommerce.cashback.undo", handler -> {
 
-      log.info("Received cashback message: {}", purchase);
+      val config = new JsonObject()
+        .put("host", config().getString("mongoHost"))
+        .put("port", config().getInteger("mongoPort"))
+        .put("db_name", "ecommerce");
 
-      ManagedChannel channel = VertxChannelBuilder
-        .forAddress(vertx, config().getString("cashBackHost"), config().getInteger("cashBackPort"))
-        .usePlaintext(true)
-        .build();
+      val obj = new JsonObject(handler.body().toString());
 
-      final RegisterCashbackTransactionVertxStub stub = RegisterCashbackTransactionGrpc
-        .newVertxStub(channel);
+      val client = MongoClient.createShared(this.vertx, config);
+      val query = new JsonObject()
+        .put("paymentId", obj.getString("paymentId"));
 
-      final RegisterCashbackRequest cashbackRequest = RegisterCashbackRequest.newBuilder()
-        .setOrder(Order.newBuilder().setId("AB").setTotal(10D).build()).setUser(
-          User.newBuilder().setEmail("joe@joe.com").setId("joe").build())
-        .setStore(Store.newBuilder().setName("ABC").build()).setType("register").build();
+      client.findOne("orders", query, null, res -> {
+        if (res.succeeded()) {
+          log.info("Success find order by paymentId: {}", obj.getString("paymentId"));
 
+          val order = Json.decodeValue(res.result().toString(),
+            com.sensedia.ecommerce.domain.data.Order.class);
 
-      stub.register(cashbackRequest, ar -> {
-        if (ar.succeeded()) {
-          log.info("Got the server response: {}", ar.result().getId());
+          CashBackRequest.send(this.vertx, "undo", config().getString("cashBackHost"),
+            config().getInteger("cashBackPort"), order);
+
+          handler.reply("ok");
         } else {
-          log.error("Coult not reach server: {}", ar.cause().getMessage());
+          log.error("Error to find order by paymentId: {}", obj.getString("paymentId"), res.cause());
+          handler.fail(1, "Call fail");
         }
       });
-
-      handler.reply(handler.body());
-      //handler.fail(1, "Call fail");
     });
   }
 }
